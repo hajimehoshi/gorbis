@@ -2,12 +2,13 @@ package vorbis
 
 import (
 	"bytes"
-	"cmath"
 	"fftw"
 	"fmt"
 	"io"
 	"math"
-	"ogg"
+	"math/cmplx"
+
+	"github.com/hajimehoshi/gorbis"
 )
 
 var magic_string string = "\x01vorbis"
@@ -135,7 +136,7 @@ func (v *vorbisDecoder) readAudioPacket(buffer io.ByteReader, num_channels int) 
 		in := make([]complex128, len(floor_outputs[mag]))
 		next := make([]float64, 2*(len(floor_outputs[ang])-1))
 		for i := range in {
-			in[i] = cmath.Rect(floor_outputs[mag][i], floor_outputs[ang][i])
+			in[i] = cmplx.Rect(floor_outputs[mag][i], floor_outputs[ang][i])
 		}
 		fftw.PlanDftC2R1d(in, next, fftw.Estimate).Execute()
 		final = append(final, next)
